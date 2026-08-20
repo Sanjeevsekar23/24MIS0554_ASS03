@@ -102,6 +102,11 @@ public class LoanProcessingSystem {
      * Validates existing loan amount against salary
      */
     public boolean validateExistingLoan(double existingLoan, double salary) {
+        if (existingLoan < 0) {
+            this.rejectionReason = "Existing loan amount cannot be negative";
+            return false;
+        }
+
         double annualSalary = salary * 12;
         if (existingLoan > annualSalary * MAX_EXISTING_LOAN_RATIO) {
             this.rejectionReason = "Existing loan exceeds threshold (max: 50% of annual salary)";
@@ -226,6 +231,7 @@ public class LoanProcessingSystem {
         this.requestedLoanAmount = requestedLoanAmount;
         this.loanTenure = loanTenure;
         this.rejectionReason = "";
+        this.approvalStatus = false;
         
         try {
             // Validate all inputs

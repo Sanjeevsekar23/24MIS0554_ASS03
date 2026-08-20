@@ -14,7 +14,9 @@ public class LoanProcessingQA {
         testInvalidSalary(system);
         testPoorCreditScore(system);
         testExistingLoanThreshold(system);
+        testNegativeExistingLoan(system);
         testHighDebtToIncomeRatio(system);
+        testApprovalStateReset(system);
         testEmploymentCategories(system);
         testLoanAmountBoundaries(system);
         testEMIAccuracy(system);
@@ -48,6 +50,20 @@ public class LoanProcessingQA {
     private static void testExistingLoanThreshold(LoanProcessingSystem system) {
         check("Existing loan at threshold accepted", system.validateExistingLoan(300000, 50000));
         check("Existing loan above threshold rejected", !system.validateExistingLoan(300001, 50000));
+    }
+
+        private static void testNegativeExistingLoan(LoanProcessingSystem system) {
+        check("Negative existing loan rejected", !system.validateExistingLoan(-1, 50000));
+    }
+
+    private static void testApprovalStateReset(LoanProcessingSystem system) {
+        boolean approved = system.processLoanApplication(
+                1003, 30, 50000, 0, 760, "Salaried", 100000, 10);
+        boolean rejected = system.processLoanApplication(
+                1004, 30, 50000, 0, 760, "Salaried", 99999, 10);
+
+        check("Valid application approved", approved);
+        check("Rejected application clears approval state", !rejected && !system.isApproved());
     }
 
     private static void testHighDebtToIncomeRatio(LoanProcessingSystem system) {
