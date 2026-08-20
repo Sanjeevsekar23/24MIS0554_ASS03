@@ -1,373 +1,434 @@
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class HospitalManagementQA {
 
-    // 1. Normal patient - General appointment
-    @Test
-    void testNormalPatient() {
-        HospitalManagement.Patient patient =
+    static int passed = 0;
+    static int failed = 0;
+
+    // Check numerical result
+    static void check(String testName, double actual, double expected) {
+        if (Math.abs(actual - expected) < 0.01) {
+            System.out.println("PASS: " + testName);
+            System.out.println("      Expected: " + expected);
+            System.out.println("      Actual  : " + actual);
+            passed++;
+        } else {
+            System.out.println("FAIL: " + testName);
+            System.out.println("      Expected: " + expected);
+            System.out.println("      Actual  : " + actual);
+            failed++;
+        }
+    }
+
+    // Check exception
+    static void checkException(String testName, Runnable test) {
+        try {
+            test.run();
+            System.out.println("FAIL: " + testName);
+            System.out.println("      Expected IllegalArgumentException");
+            failed++;
+        } catch (IllegalArgumentException e) {
+            System.out.println("PASS: " + testName);
+            System.out.println("      Correct exception thrown");
+            passed++;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println("========================================");
+        System.out.println("   HOSPITAL MANAGEMENT QA TESTING");
+        System.out.println("========================================");
+
+        // 1. Normal patient - General appointment
+        HospitalManagement.Patient patient1 =
                 new HospitalManagement.Patient(
                         "Arun", 30, false, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "General", 30);
+        double fee1 =
+                HospitalManagement.calculateConsultationFee(
+                        patient1, "General", 30);
 
-        assertEquals(500, fee, 0.01);
-    }
+        check("1. Normal Patient - General Appointment",
+                fee1, 500);
 
-    // 2. Specialist appointment
-    @Test
-    void testSpecialistAppointment() {
-        HospitalManagement.Patient patient =
+
+        // 2. Specialist appointment
+        HospitalManagement.Patient patient2 =
                 new HospitalManagement.Patient(
                         "Rahul", 35, false, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "Specialist", 30);
+        double fee2 =
+                HospitalManagement.calculateConsultationFee(
+                        patient2, "Specialist", 30);
 
-        assertEquals(1000, fee, 0.01);
-    }
+        check("2. Specialist Appointment",
+                fee2, 1000);
 
-    // 3. Emergency appointment
-    @Test
-    void testEmergencyAppointment() {
-        HospitalManagement.Patient patient =
+
+        // 3. Emergency appointment
+        HospitalManagement.Patient patient3 =
                 new HospitalManagement.Patient(
                         "Kiran", 40, true, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "Emergency", 30);
+        double fee3 =
+                HospitalManagement.calculateConsultationFee(
+                        patient3, "Emergency", 30);
 
-        assertEquals(2000, fee, 0.01);
-    }
+        // 1500 + 500 emergency = 2000
+        check("3. Emergency Appointment",
+                fee3, 2000);
 
-    // 4. Long consultation
-    @Test
-    void testLongConsultation() {
-        HospitalManagement.Patient patient =
+
+        // 4. Long consultation
+        HospitalManagement.Patient patient4 =
                 new HospitalManagement.Patient(
                         "Vijay", 40, false, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "General", 45);
+        double fee4 =
+                HospitalManagement.calculateConsultationFee(
+                        patient4, "General", 45);
 
-        assertEquals(800, fee, 0.01);
-    }
+        // 500 + 300 = 800
+        check("4. Long Consultation",
+                fee4, 800);
 
-    // 5. Senior citizen discount
-    @Test
-    void testSeniorCitizen() {
-        HospitalManagement.Patient patient =
+
+        // 5. Senior citizen discount
+        HospitalManagement.Patient patient5 =
                 new HospitalManagement.Patient(
                         "Ravi", 65, false, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "General", 30);
+        double fee5 =
+                HospitalManagement.calculateConsultationFee(
+                        patient5, "General", 30);
 
-        assertEquals(400, fee, 0.01);
-    }
+        // 500 × 80% = 400
+        check("5. Senior Citizen Discount",
+                fee5, 400);
 
-    // 6. Follow-up consultation
-    @Test
-    void testFollowUpConsultation() {
-        HospitalManagement.Patient patient =
+
+        // 6. Follow-up consultation
+        HospitalManagement.Patient patient6 =
                 new HospitalManagement.Patient(
                         "Manoj", 40, false, false, true);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "General", 30);
+        double fee6 =
+                HospitalManagement.calculateConsultationFee(
+                        patient6, "General", 30);
 
-        assertEquals(250, fee, 0.01);
-    }
+        // 500 × 50% = 250
+        check("6. Follow-up Consultation",
+                fee6, 250);
 
-    // 7. Senior citizen + follow-up
-    @Test
-    void testSeniorFollowUp() {
-        HospitalManagement.Patient patient =
+
+        // 7. Senior citizen + follow-up
+        HospitalManagement.Patient patient7 =
                 new HospitalManagement.Patient(
                         "Suresh", 70, false, false, true);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "Specialist", 30);
+        double fee7 =
+                HospitalManagement.calculateConsultationFee(
+                        patient7, "Specialist", 30);
 
-        assertEquals(400, fee, 0.01);
-    }
+        // 1000 × 80% × 50% = 400
+        check("7. Senior + Follow-up",
+                fee7, 400);
 
-    // 8. Emergency + senior citizen
-    @Test
-    void testEmergencySeniorCitizen() {
-        HospitalManagement.Patient patient =
+
+        // 8. Emergency + senior citizen
+        HospitalManagement.Patient patient8 =
                 new HospitalManagement.Patient(
                         "Mohan", 65, true, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "Emergency", 30);
+        double fee8 =
+                HospitalManagement.calculateConsultationFee(
+                        patient8, "Emergency", 30);
 
-        assertEquals(1600, fee, 0.01);
-    }
+        // (1500 + 500) × 80% = 1600
+        check("8. Emergency + Senior Citizen",
+                fee8, 1600);
 
-    // 9. Emergency + long consultation
-    @Test
-    void testEmergencyLongConsultation() {
-        HospitalManagement.Patient patient =
+
+        // 9. Emergency + long consultation
+        HospitalManagement.Patient patient9 =
                 new HospitalManagement.Patient(
                         "Ajay", 40, true, false, false);
 
-        double fee = HospitalManagement.calculateConsultationFee(
-                patient, "Emergency", 45);
+        double fee9 =
+                HospitalManagement.calculateConsultationFee(
+                        patient9, "Emergency", 45);
 
-        assertEquals(2300, fee, 0.01);
-    }
+        // 1500 + 300 + 500 = 2300
+        check("9. Emergency + Long Consultation",
+                fee9, 2300);
 
-    // 10. Blood test
-    @Test
-    void testBloodTest() {
-        String[] tests = {"Blood Test"};
 
-        double charges =
-                HospitalManagement.calculateLabCharges(tests);
+        // 10. Blood test
+        String[] tests10 = {"Blood Test"};
 
-        assertEquals(300, charges, 0.01);
-    }
+        double lab10 =
+                HospitalManagement.calculateLabCharges(tests10);
 
-    // 11. Multiple lab tests
-    @Test
-    void testMultipleLabTests() {
-        String[] tests = {
+        check("10. Blood Test",
+                lab10, 300);
+
+
+        // 11. Multiple lab tests
+        String[] tests11 = {
                 "Blood Test",
                 "X-Ray",
                 "MRI"
         };
 
-        double charges =
-                HospitalManagement.calculateLabCharges(tests);
+        double lab11 =
+                HospitalManagement.calculateLabCharges(tests11);
 
-        assertEquals(3800, charges, 0.01);
-    }
+        // 300 + 500 + 3000 = 3800
+        check("11. Multiple Lab Tests",
+                lab11, 3800);
 
-    // 12. No lab tests
-    @Test
-    void testNoLabTests() {
-        String[] tests = {"None"};
 
-        double charges =
-                HospitalManagement.calculateLabCharges(tests);
+        // 12. No lab tests
+        String[] tests12 = {"None"};
 
-        assertEquals(0, charges, 0.01);
-    }
+        double lab12 =
+                HospitalManagement.calculateLabCharges(tests12);
 
-    // 13. Single medicine
-    @Test
-    void testSingleMedicine() {
-        Map<String, Integer> medicines = new HashMap<>();
-        medicines.put("Paracetamol", 5);
+        check("12. No Lab Tests",
+                lab12, 0);
 
-        double charges =
-                HospitalManagement.calculateMedicineCharges(medicines);
 
-        assertEquals(50, charges, 0.01);
-    }
+        // 13. Single medicine
+        Map<String, Integer> medicines13 =
+                new HashMap<>();
 
-    // 14. Multiple medicines
-    @Test
-    void testMultipleMedicines() {
-        Map<String, Integer> medicines = new HashMap<>();
+        medicines13.put("Paracetamol", 5);
 
-        medicines.put("Paracetamol", 5);
-        medicines.put("Antibiotic", 2);
-        medicines.put("Painkiller", 3);
+        double medicine13 =
+                HospitalManagement.calculateMedicineCharges(
+                        medicines13);
 
-        double charges =
-                HospitalManagement.calculateMedicineCharges(medicines);
+        check("13. Single Medicine",
+                medicine13, 50);
 
-        assertEquals(250, charges, 0.01);
-    }
 
-    // 15. Insurance patient
-    @Test
-    void testInsuranceCoverage() {
-        HospitalManagement.Patient patient =
+        // 14. Multiple medicines
+        Map<String, Integer> medicines14 =
+                new HashMap<>();
+
+        medicines14.put("Paracetamol", 5);
+        medicines14.put("Antibiotic", 2);
+        medicines14.put("Painkiller", 3);
+
+        double medicine14 =
+                HospitalManagement.calculateMedicineCharges(
+                        medicines14);
+
+        // 50 + 100 + 90 = 240
+        check("14. Multiple Medicines",
+                medicine14, 240);
+
+
+        // 15. Insurance patient
+        HospitalManagement.Patient patient15 =
                 new HospitalManagement.Patient(
                         "Ramesh", 40, false, true, false);
 
-        double coverage =
+        double coverage15 =
                 HospitalManagement.calculateInsuranceCoverage(
-                        patient, 10000);
+                        patient15, 10000);
 
-        assertEquals(7000, coverage, 0.01);
-    }
+        // 70% of 10000 = 7000
+        check("15. Insurance Coverage",
+                coverage15, 7000);
 
-    // 16. Non-insurance patient
-    @Test
-    void testNoInsurance() {
-        HospitalManagement.Patient patient =
+
+        // 16. Non-insurance patient
+        HospitalManagement.Patient patient16 =
                 new HospitalManagement.Patient(
                         "Dinesh", 40, false, false, false);
 
-        double coverage =
+        double coverage16 =
                 HospitalManagement.calculateInsuranceCoverage(
-                        patient, 10000);
+                        patient16, 10000);
 
-        assertEquals(0, coverage, 0.01);
-    }
+        check("16. No Insurance",
+                coverage16, 0);
 
-    // 17. Final bill without insurance
-    @Test
-    void testFinalBillWithoutInsurance() {
-        HospitalManagement.Patient patient =
+
+        // 17. Final bill without insurance
+        HospitalManagement.Patient patient17 =
                 new HospitalManagement.Patient(
                         "Amit", 30, false, false, false);
 
-        double payable =
+        double payable17 =
                 HospitalManagement.calculatePatientPayable(
-                        patient,
+                        patient17,
                         500,
                         300,
                         200);
 
-        assertEquals(1000, payable, 0.01);
-    }
+        // 500 + 300 + 200 = 1000
+        check("17. Final Bill Without Insurance",
+                payable17, 1000);
 
-    // 18. Final bill with insurance
-    @Test
-    void testFinalBillWithInsurance() {
-        HospitalManagement.Patient patient =
+
+        // 18. Final bill with insurance
+        HospitalManagement.Patient patient18 =
                 new HospitalManagement.Patient(
                         "Karthik", 30, false, true, false);
 
-        double payable =
+        double payable18 =
                 HospitalManagement.calculatePatientPayable(
-                        patient,
+                        patient18,
                         1000,
                         2000,
                         1000);
 
         // Total = 4000
-        // Insurance = 70% = 2800
+        // Insurance = 2800
         // Payable = 1200
+        check("18. Final Bill With Insurance",
+                payable18, 1200);
 
-        assertEquals(1200, payable, 0.01);
-    }
 
-    // 19. Senior + insurance
-    @Test
-    void testSeniorInsurancePatient() {
-        HospitalManagement.Patient patient =
+        // 19. Senior + insurance
+        HospitalManagement.Patient patient19 =
                 new HospitalManagement.Patient(
                         "Krishna", 65, false, true, false);
 
-        double consultation =
+        double consultation19 =
                 HospitalManagement.calculateConsultationFee(
-                        patient, "Specialist", 30);
+                        patient19, "Specialist", 30);
 
-        assertEquals(800, consultation, 0.01);
+        // 1000 × 80% = 800
+        check("19. Senior Insurance - Consultation",
+                consultation19, 800);
 
-        double payable =
+        double payable19 =
                 HospitalManagement.calculatePatientPayable(
-                        patient,
-                        consultation,
+                        patient19,
+                        consultation19,
                         1000,
                         500);
 
         // Total = 2300
         // Insurance = 1610
         // Payable = 690
+        check("19. Senior Insurance - Payable",
+                payable19, 690);
 
-        assertEquals(690, payable, 0.01);
-    }
 
-    // 20. Emergency + insurance
-    @Test
-    void testEmergencyInsurancePatient() {
-        HospitalManagement.Patient patient =
+        // 20. Emergency + insurance
+        HospitalManagement.Patient patient20 =
                 new HospitalManagement.Patient(
                         "Vasanth", 40, true, true, false);
 
-        double consultation =
+        double consultation20 =
                 HospitalManagement.calculateConsultationFee(
-                        patient, "Emergency", 30);
+                        patient20, "Emergency", 30);
 
-        assertEquals(2000, consultation, 0.01);
+        // 1500 + 500 = 2000
+        check("20. Emergency Insurance - Consultation",
+                consultation20, 2000);
 
-        double payable =
+        double payable20 =
                 HospitalManagement.calculatePatientPayable(
-                        patient,
-                        consultation,
+                        patient20,
+                        consultation20,
                         1000,
                         500);
 
         // Total = 3500
         // Insurance = 2450
         // Payable = 1050
+        check("20. Emergency Insurance - Payable",
+                payable20, 1050);
 
-        assertEquals(1050, payable, 0.01);
-    }
 
-    // 21. Invalid appointment type
-    @Test
-    void testInvalidAppointmentType() {
-        HospitalManagement.Patient patient =
+        // 21. Invalid appointment type
+        HospitalManagement.Patient patient21 =
                 new HospitalManagement.Patient(
                         "Arun", 30, false, false, false);
 
-        assertThrows(
-                IllegalArgumentException.class,
+        checkException(
+                "21. Invalid Appointment Type",
                 () -> HospitalManagement.calculateConsultationFee(
-                        patient, "Invalid", 30)
+                        patient21, "Invalid", 30)
         );
-    }
 
-    // 22. Invalid lab test
-    @Test
-    void testInvalidLabTest() {
-        String[] tests = {"Invalid Test"};
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> HospitalManagement.calculateLabCharges(tests)
+        // 22. Invalid lab test
+        String[] tests22 = {"Invalid Test"};
+
+        checkException(
+                "22. Invalid Lab Test",
+                () -> HospitalManagement.calculateLabCharges(
+                        tests22)
         );
-    }
 
-    // 23. Invalid medicine
-    @Test
-    void testInvalidMedicine() {
-        Map<String, Integer> medicines = new HashMap<>();
-        medicines.put("Unknown Medicine", 2);
 
-        assertThrows(
-                IllegalArgumentException.class,
+        // 23. Invalid medicine
+        Map<String, Integer> medicines23 =
+                new HashMap<>();
+
+        medicines23.put("Unknown Medicine", 2);
+
+        checkException(
+                "23. Invalid Medicine",
                 () -> HospitalManagement.calculateMedicineCharges(
-                        medicines)
+                        medicines23)
         );
-    }
 
-    // 24. Zero medicine quantity
-    @Test
-    void testZeroMedicineQuantity() {
-        Map<String, Integer> medicines = new HashMap<>();
-        medicines.put("Paracetamol", 0);
 
-        assertThrows(
-                IllegalArgumentException.class,
+        // 24. Zero medicine quantity
+        Map<String, Integer> medicines24 =
+                new HashMap<>();
+
+        medicines24.put("Paracetamol", 0);
+
+        checkException(
+                "24. Zero Medicine Quantity",
                 () -> HospitalManagement.calculateMedicineCharges(
-                        medicines)
+                        medicines24)
         );
-    }
 
-    // 25. Negative medicine quantity
-    @Test
-    void testNegativeMedicineQuantity() {
-        Map<String, Integer> medicines = new HashMap<>();
-        medicines.put("Paracetamol", -5);
 
-        assertThrows(
-                IllegalArgumentException.class,
+        // 25. Negative medicine quantity
+        Map<String, Integer> medicines25 =
+                new HashMap<>();
+
+        medicines25.put("Paracetamol", -5);
+
+        checkException(
+                "25. Negative Medicine Quantity",
                 () -> HospitalManagement.calculateMedicineCharges(
-                        medicines)
+                        medicines25)
         );
+
+
+        // FINAL RESULT
+        System.out.println();
+        System.out.println("========================================");
+        System.out.println("             TEST SUMMARY");
+        System.out.println("========================================");
+        System.out.println("Tests Passed : " + passed);
+        System.out.println("Tests Failed : " + failed);
+        System.out.println("Total Tests  : " + (passed + failed));
+
+        if (failed == 0) {
+            System.out.println("ALL TESTS PASSED");
+        } else {
+            System.out.println("SOME TESTS FAILED");
+        }
+
+        System.out.println("========================================");
+
+        // Make Jenkins build fail if any test fails
+        if (failed > 0) {
+            System.exit(1);
+        }
     }
 }
