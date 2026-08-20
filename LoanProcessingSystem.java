@@ -166,9 +166,11 @@ public class LoanProcessingSystem {
         int employmentIndex = getEmploymentTypeIndex(employmentType);
         double employmentMultiplier = EMPLOYMENT_MULTIPLIERS[employmentIndex];
         
-        double baseEligibleLoan = annualSalary * 5 * employmentMultiplier;
+        double baseEligibleLoan = annualSalary * 5;
         double eligibleLoan = Math.min(baseEligibleLoan, maxDTILoan);
-        
+
+        eligibleLoan = eligibleLoan * employmentMultiplier;
+
         return Math.max(0, eligibleLoan);
     }
     
