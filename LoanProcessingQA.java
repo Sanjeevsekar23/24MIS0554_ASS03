@@ -78,7 +78,7 @@ public class LoanProcessingQA {
 
     private static void testEMIAccuracy(LoanProcessingSystem system) {
         double actual = system.calculateEMI(1000000, 10, 10);
-        double expected = 13215.788338;
+        double expected = 13215.073688;
         check("EMI calculation accuracy", Math.abs(actual - expected) < EPSILON);
         check("Zero-interest EMI calculation", 
                 Math.abs(system.calculateEMI(120000, 0, 1) - 10000) < EPSILON);
