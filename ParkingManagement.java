@@ -528,6 +528,27 @@ public class ParkingManagement {
         System.out.println(
                 "======================================");
     }
+    // ============================================================
+// EV CHARGING FEE
+// ============================================================
+
+public static double calculateEVChargingFee(
+        String vehicleType,
+        double chargingUnits) {
+
+    if (!vehicleType.equalsIgnoreCase("Electric Vehicle")) {
+        throw new IllegalArgumentException(
+                "Charging fee is only applicable to Electric Vehicle");
+    }
+
+    if (chargingUnits < 0) {
+        throw new IllegalArgumentException(
+                "Charging units cannot be negative");
+    }
+
+    // ₹15 per charging unit
+    return chargingUnits * 15;
+}
 
     // ============================================================
     // MAIN METHOD
